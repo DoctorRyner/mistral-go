@@ -37,4 +37,27 @@ func main() {
 	}
 
 	log.Printf("Embeddings response: %+v\n", embsRes)
+
+	// Example: Using Agent Chat Completions
+	agentReqParam := mistral.DefaultChatRequestParams
+	agentReqParam.AgentId = "your-agent-id"
+	agentRes, err := client.Chat("mistral-tiny", []mistral.ChatMessage{{Content: "Hello, world!", Role: mistral.RoleUser}}, &agentReqParam)
+	if err != nil {
+		log.Fatalf("Error getting chat completion: %v", err)
+	}
+	log.Printf("Agent chat completion: %+v\n", agentRes)
+
+	// Example: Using Agent Chat Completions Stream
+	agentStreamReqParam := mistral.DefaultChatRequestParams
+	agentStreamReqParam.AgentId = "your-agent-id"
+	agentResChan, err := client.ChatStream("mistral-tiny", []mistral.ChatMessage{{Content: "Hello, world!", Role: mistral.RoleUser}}, &agentStreamReqParam)
+	if err != nil {
+		log.Fatalf("Error getting chat completion stream: %v", err)
+	}
+	for agentResChunk := range agentResChan {
+		if agentResChunk.Error != nil {
+			log.Fatalf("Error while streaming response: %v", agentResChunk.Error)
+		}
+		log.Printf("Agent chat completion stream part: %+v\n", agentResChunk)
+	}
 }
